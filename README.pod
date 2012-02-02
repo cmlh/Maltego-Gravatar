@@ -1,0 +1,7 @@
+=head1 Introduction
+
+This <Lhttp://www.paterva.com/web5/documentation/localtransforms.php|Maltego Local Transform> returns a <Lhttp://en.gravatar.com/site/implement/images/|Gravatar Avatar> based on their e-mail address.
+
+Please refer to the <LWiki|https://github.com/cmlh/Maltego-Gravatar/wiki> for further information.
+
+
