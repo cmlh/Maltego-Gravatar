@@ -3,36 +3,36 @@
 #
 # Please refer to the Plain Old Documentation (POD) at the end of this Perl Script for further information
 
-
 # http://en.gravatar.com/site/implement/images/perl/
-
 
 use strict;
 use Carp;
 use Pod::Usage;
 
-
 my $VERSION = "0.0.1"; # May be required to upload script to CPAN i.e. http://www.cpan.org/scripts/submitting.html
 
 # http://ctas.paterva.com/view/Specification#Message_Wrapper
-print ("<MaltegoMessage>\n");
-print ("<MaltegoTransformResponseMessage>\n");
-print ("<UIMessages>\n");
-print ("		<UIMessage MessageType=\"Inform\">Gravatar Image Local Transform v$VERSION</UIMessage>\n");
-print ("</UIMessages>\n");
+print("<MaltegoMessage>\n");
+print("<MaltegoTransformResponseMessage>\n");
+print("<UIMessages>\n");
+print(
+"		<UIMessage MessageType=\"Inform\">Gravatar Image Local Transform v$VERSION</UIMessage>\n"
+);
+print("</UIMessages>\n");
 
 # Command line arguments from Maltego
 my $maltego_selected_entity_value = $ARGV[0];
+
 # Not used
 my $maltego_additional_field_values = $ARGV[1];
-
 
 # Process the command line arguments
 chomp($maltego_selected_entity_value);
 chomp($maltego_additional_field_values);
 
 # http://ctas.paterva.com/view/Specification#Messages_to_STDERR_.28progress.2C_debug.29
-print STDERR "Value of \$maltego_selected_entity_value is \"$maltego_selected_entity_value\"\n";
+print STDERR
+"Value of \$maltego_selected_entity_value is \"$maltego_selected_entity_value\"\n";
 
 my $gravatar_image_url = "$maltego_selected_entity_value.jpg";
 
@@ -40,24 +40,22 @@ my $gravatar_image_url = "$maltego_selected_entity_value.jpg";
 print STDERR "Value of \$gravatar_image_url is \"$gravatar_image_url\"\n";
 
 # http://ctas.paterva.com/view/Specification#Entity_definition
-print ("\t<Entities>\n");
-# TODO Return all for "Rating"s i.e. "g", "pg", "r" and "x" http://en.gravatar.com/site/implement/images/
-print ("\t\t<Entity Type=\"maltego.image\"><Value>Gravatar Image</Value>\n");
-print ("\t\t<AdditionalFields>\n");
-print ("\t\t\t<Field Name=\"fullImage\">$gravatar_image_url</Field>\n");
-print ("\t\t</AdditionalFields>\n");
-# http://ctas.paterva.com/view/Specification#.3CIconURL.3E
-print ("\t\t<IconURL>$maltego_selected_entity_value.jpg</IconURL>\n");
-print ("\t</Entity>\n");
-print ("\t</Entities>\n");
+print("\t<Entities>\n");
 
+# TODO Return all for "Rating"s i.e. "g", "pg", "r" and "x" http://en.gravatar.com/site/implement/images/
+print("\t\t<Entity Type=\"maltego.image\"><Value>Gravatar Image</Value>\n");
+print("\t\t<AdditionalFields>\n");
+print("\t\t\t<Field Name=\"fullImage\">$gravatar_image_url</Field>\n");
+print("\t\t</AdditionalFields>\n");
+
+# http://ctas.paterva.com/view/Specification#.3CIconURL.3E
+print("\t\t<IconURL>$maltego_selected_entity_value.jpg</IconURL>\n");
+print("\t</Entity>\n");
+print("\t</Entities>\n");
 
 # http://ctas.paterva.com/view/Specification#Message_Wrapper
-print ("</MaltegoTransformResponseMessage>\n");
-print ("</MaltegoMessage>\n");
-
-
-
+print("</MaltegoTransformResponseMessage>\n");
+print("</MaltegoMessage>\n");
 
 =head1 NAME
 

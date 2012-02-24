@@ -3,28 +3,27 @@
 #
 # Please refer to the Plain Old Documentation (POD) at the end of this Perl Script for further information
 
-
 # http://en.gravatar.com/site/implement/images/perl/
 
 use strict;
 use Carp;
 use Pod::Usage;
 use Digest::MD5 qw(md5_hex);
-use LWP::UserAgent;
 
 my $VERSION = "0.0.1"; # May be required to upload script to CPAN i.e. http://www.cpan.org/scripts/submitting.html
 
 # Command line arguments from Maltego
 my $maltego_selected_entity_value = $ARGV[0];
+
 # Not used
 my $maltego_additional_field_values = $ARGV[1];
-
 
 # Process the command line arguments
 chomp($maltego_selected_entity_value);
 chomp($maltego_additional_field_values);
 
-print STDERR "Value of \$maltego_selected_entity_value is \"$maltego_selected_entity_value\"\n";
+print STDERR
+"Value of \$maltego_selected_entity_value is \"$maltego_selected_entity_value\"\n";
 
 # http://en.gravatar.com/site/implement/hash/
 # TODO Refactor as subroutine i.e. "gravatar_hash"
@@ -33,82 +32,61 @@ print STDERR "Value of \$maltego_selected_entity_value is \"$maltego_selected_en
 my $email_address = "$maltego_selected_entity_value";
 $email_address =~ s/^\s+//;
 $email_address =~ s/\s+$//;
-print STDERR "Value of \$email_address after whitespace trim is \"$email_address\"\n";
+print STDERR
+  "Value of \$email_address after whitespace trim is \"$email_address\"\n";
 
 # Force all characters of the e-mail address to lower-case
 $email_address = lc($email_address);
-print STDERR "Value of \$email_address after conversion to lowercase is \"$email_address\"\n";
+print STDERR
+"Value of \$email_address after conversion to lowercase is \"$email_address\"\n";
 
 # Calculate the MD5 hash of the e-mail address
 my $md5_of_email_address = md5_hex($email_address);
-print STDERR "Value of \$md5_of_email_address after conversion to lowercase is \"$md5_of_email_address\"\n";
+print STDERR
+"Value of \$md5_of_email_address after conversion to lowercase is \"$md5_of_email_address\"\n";
 
 # http://en.gravatar.com/site/implement/images/
 my $gravatar_url = "http://www.gravatar.com/avatar/$md5_of_email_address";
 print STDERR "Value of \$gravatar_url is \"$gravatar_url\"\n";
 
+# TODO Do not return a cmlh.affiliation.gravatar in the event of HTTP Status 404 i.e. [$image_url]?default=404 if there is no MD5 hash associated with the e-mail address.
+# Refer to "Default" within http://en.gravatar.com/site/implement/images/ for further information
+
 # http://ctas.paterva.com/view/Specification#Message_Wrapper
-print ("<MaltegoMessage>\n");
-print ("<MaltegoTransformResponseMessage>\n");
-print ("<UIMessages>\n");
-print ("\t<UIMessage MessageType=\"Inform\">To Gravatar Affilation - Local Transform v$VERSION</UIMessage>\n");
-
-
-# Check HTTP Status 404 i.e. [$image_url]?default=404 if there is no MD5 hash associated with the e-mail address i.e. Refer to "Default" within http://en.gravatar.com/site/implement/images/
-my $gravatar_url_d404 = $gravatar_url . "?d=404";
-print STDERR "Value of \$gravatar_url_d404 is \"$gravatar_url_d404\"\n";
-my $web_request = LWP::UserAgent->new;
-my $web_response = $web_request->get("$gravatar_url_d404");
-if (! $web_response->is_success) {
-	my $web_status_code = $web_response->status_line;
-	print STDERR ("No Gravatar URL associated with $email_address -- $web_status_code");
-	print ("\t<UIMessage MessageType=\"PartialError\">No Gravatar URL associated with $email_address</UIMessage>\n");
-	print ("</UIMessages>\n");
-	print ("\t<Entities>\n");
-	print ("\t\t<Entity Type=\"cmlh.MD5\"><Value>$md5_of_email_address</Value>\n");
-	print ("\t</Entity>\n");
-	print ("\t</Entities>\n");
-	print ("</MaltegoTransformResponseMessage>\n");
-	print ("</MaltegoMessage>\n");
-	exit();
-}
-
-my $gravatar_image_url = $gravatar_url . ".jpg";
+print("<MaltegoMessage>\n");
+print("<MaltegoTransformResponseMessage>\n");
+print("<UIMessages>\n");
+print(
+"		<UIMessage MessageType=\"Inform\">To Gravatar Affilation - Local Transform v$VERSION</UIMessage>\n"
+);
+print("</UIMessages>\n");
 
 # http://ctas.paterva.com/view/Specification#Entity_definition
-print ("</UIMessages>\n");
-print ("\t<Entities>\n");
-print ("\t\t<Entity Type=\"cmlh.MD5\"><Value>$md5_of_email_address</Value>\n");
-print ("\t</Entity>\n");
-print ("\t\t<Entity Type=\"cmlh.affiliation.gravatar\"><Value>$gravatar_url</Value>\n");
-print ("\t\t<AdditionalFields>\n");
-print ("\t\t\t<Field Name=\"properties.affiliation.gravatar\">$gravatar_url</Field>\n");
-print ("\t\t</AdditionalFields>\n");
-print ("\t</Entity>\n");
-print ("\t\t<Entity Type=\"maltego.image\"><Value>Gravatar Image</Value>\n");
-print ("\t\t<AdditionalFields>\n");
-print ("\t\t\t<Field Name=\"fullImage\">$gravatar_image_url</Field>\n");
-print ("\t\t</AdditionalFields>\n");
-# http://ctas.paterva.com/view/Specification#.3CIconURL.3E
-print ("\t\t<IconURL>$gravatar_image_url</IconURL>\n");
-print ("\t</Entity>\n");
-print ("\t</Entities>\n");
-
+print("\t<Entities>\n");
+print("\t\t<Entity Type=\"cmlh.MD5\"><Value>$md5_of_email_address</Value>\n");
+print("\t</Entity>\n");
+print(
+"\t\t<Entity Type=\"cmlh.affiliation.gravatar\"><Value>$gravatar_url</Value>\n"
+);
+print("\t\t<AdditionalFields>\n");
+print(
+"\t\t\t<Field Name=\"properties.affiliation.gravatar\">$gravatar_url</Field>\n"
+);
+print("\t\t</AdditionalFields>\n");
+print("\t</Entity>\n");
+print("\t</Entities>\n");
 
 # http://ctas.paterva.com/view/Specification#Message_Wrapper
-print ("</MaltegoTransformResponseMessage>\n");
-print ("</MaltegoMessage>\n");
-
-
-
+print("</MaltegoTransformResponseMessage>\n");
+print("</MaltegoMessage>\n");
 
 =head1 NAME
 
-gravatar-maltego-local-transform.pl - "Gravatar - Maltego Local Transform"
+gravatar-url-maltego-local-transform.pl - "Gravatar URL - Maltego Local Transform"
 
 =head1 VERSION
 
-This documentation refers to "Gravatar - Maltego Local Transform" Alpha $VERSION
+This documentation refers to "Gravatar URL - Maltego Local Transform" Alpha $VERSION
 
 =head1 MALTEGO CONFIGURATION
 
